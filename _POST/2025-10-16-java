@@ -1,0 +1,233 @@
+---
+title: "java"
+date: 2025-10-16
+---
+# JAVA
+
+Java介于编译型语言和解释型语言之间，将代码编译成一种字节码，然后针对不同平台编写虚拟机，不同虚拟机加载字节码并执行--一次编写，到处运行。
+
+- Java SE:Standard Edition:语言本身，核心开发技术及标准库使用
+- Java EE:Enterprise Edition:Spring框架，数据库开发，分布式架构
+- Java ME:Micro Edition
+
+**名词解释**
+
+- JDK：Java Development Kit
+- JRE：Java Runtime Environment
+
+JRE是运行Java字节码的虚拟机，JDK将Java源码编译成字节码
+
+JDK包含JRE，并且提供编译器，调试器等开发工具
+
+javac是编译器，将.java源码编译成.class字节码
+
+## 基础
+
+### Java程序基本结构
+
+```java
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+```
+
+- **访问修饰符**：public表示类公开，没有则类无法从命令行执行
+
+- **类**：class(关键字) Hello(类名)
+
+- **方法**：static void main(String[] args)
+
+  > Java入口程序规定的方法必须是**静态方法**，方法名必须为**main**，括号内的参数必须为**String数组**
+
+- **注释***
+
+  - //单行注释
+  - /*多行注释*/
+  - /**自动创建文档的注释*/
+
+### 变量和数据类型
+
+基本数据类型及占用字节数
+
+- **byte**：1
+
+- **short**：2
+- **int**：4
+- **long**：8
+- **float**：4
+- **double**：8
+- **char**：2
+
+#### 字节型
+
+#### 整型
+
+byte short int long 带符号整型
+
+```java
+long n1 = 900000000000000000000000L;//long型结尾+L
+long n2 = 23;//可以将int类型复制给long
+int i = 900L;//❌不能将long型赋值给int
+//类型自动提升并强制转型，short与int计算，结果总是int’而两个整数运算不会自动提升类型
+short s = (short) i;//将int强制转换成short,高位字节被舍弃。可能导致错误结果
+
+//左移运算
+int n = 7;       // 00000000 00000000 00000000 00000111 = 7
+int a = n << 1;  // 00000000 00000000 00000000 00001110 = 14
+int b = n << 2;  // 00000000 00000000 00000000 00011100 = 28
+int c = n << 28; // 01110000 00000000 00000000 00000000 = 1879048192
+int d = n << 29; // 11100000 00000000 00000000 00000000 = -536870912 最高位改变，符号改变
+
+//无符号整数--逻辑右移，左边补0
+//有符号整数--算数右移，左边补符号位符号不变>>;高位补0>>>
+int n = -536870912;
+int a = n >> 1;  // 11110000 00000000 00000000 00000000 = -268435456
+int b = n >> 2;  // 11111000 00000000 00000000 00000000 = -134217728
+int c = n >> 28; // 11111111 11111111 11111111 11111110 = -2 
+int d = n >> 29; // 11111111 11111111 11111111 11111111 = -1 注意负数以补码形式存储，取反+1得真值
+int d = n >>> 31; // 00000000 00000000 00000000 00000001 = 1 变成正数
+
+& //与 按位与判断一个IP是否在给定网段
+| //或
+~ //非
+^ //异或
+    
+```
+
+#### 浮点型
+
+float double
+
+```java
+float f1 = 3.14e-38f;//浮点型后+f
+float f2 = 1.0;//不带f结尾的是double类型，不能赋值给float
+
+//没有位运算和移位运算，无法精确表示,整型将自动提升到浮点型
+Math.abs(x - y) < 1e-9;
+//浮点数转型为整数，舍弃小数部分，想要四舍五入可以给浮点数+0.5；如果超出整型最大范围，返回整型最大值
+int n4 = (int) (12.7 + 0.5); // 舍弃小数部分
+int n5 = (int) 1.2e20; // 2147483647
+int n = (int) (d + 0.5);//四舍五入
+```
+
+> 整数运算除数为0会报错，浮点数除数为0返回NaN 或Infinity或-Infinity
+
+#### 布尔类型
+
+boolean
+
+```java
+boolean b1 = true;
+boolean isGreater = 5 > 3;//结果为true
+//布尔运算是短路运算：如果一个布尔运算得表达式可以提前确定结果，则后续计算不再执行
+boolean result = b && (5 / 0 > 0); // 此处 5 / 0 不会报错
+```
+
+#### 字符型
+
+char
+
+```java
+char a = '中';//单引号，一个表示一个Unicode字符
+int n1 = 'A';//可以将char类型赋值给int类型，显示Unicode编码
+char c1 = '\u0041';//用\u+Unicode表示一个字符
+```
+
+#### 引用类型
+
+String 类似于指针
+
+```java
+String s = "hello";//一个字符串可存储0到任意个字符
+//+连接字符串与其他类型（转换成字符串型）
+String s = """ 
+           SELECT * FROM
+             users
+           WHERE id > 100
+           ORDER BY name DESC
+    """;//"""..."""表示多行字符。DESC后有\n此字符串占据5行
+    //后"""仅跟最后一个字符串，不计入新行
+//字符串不可变
+// 字符串不可变
+public class Main {
+    public static void main(String[] args) {
+        String s = "hello";
+        System.out.println(s); // 显示 hello
+        s = "world";
+        System.out.println(s); // 显示 world
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        String s = "hello";
+        String t = s;
+        s = "world";
+        System.out.println(t); // t是"hello"
+    }
+} 
+```
+
+![image-20251015204041210](D:\PROJECT\MDProject\Java\JAVA.assets\image-20251015204041210.png)
+
+#### 常量
+
+```JAVA
+final double PI = 3.14;//变量前加final修饰符变成常量
+```
+
+> 为了与变量区分开，常量名全部**大写**
+
+#### 数组
+
+- 所有元素初始化为默认值，整型是0，浮点型是0.0，布尔型是False
+- 数组一旦创建，大小不可变
+
+```java
+int[] ns = new int[5];
+//数组是引用类型，索引超出范围会报错
+int[] ns = new int[] { 68, 79, 91, 85, 62 };//定义时直接指定初始化元素则不必写出数组大小，编译器自动推算ns.length
+int[] ns = { 68, 79, 91, 85, 62 };//简写
+//数组不可变
+public class Main {
+    public static void main(String[] args) {
+        String[] names = {"ABC", "XYZ", "zoo"};
+        String s = names[1];
+        names[1] = "cat";
+        System.out.println(s); // s是"XYZ"
+    }
+}
+```
+
+#### var关键字
+
+```JAVA
+var sb = new StringBuilder();//系统自动推断sb的类型
+```
+
+### 数组操作
+
+```java
+String[] ns = {"banana","apple","pear"};
+Arrays.sort(ns);//排序
+for (String n : ns){
+    System.out.println(n);//for each遍历
+}//直接获取元素，无法获取索引
+System.out.println(Arrays.toString(ns));//快速打印
+```
+
+- **二维数组**
+
+```java
+import java.util.Arrays;
+int[][] ns = {
+            { 1, 2, 3, 4 },
+            { 5, 6 },
+            { 7, 8, 9 }
+        };
+System.out.println(Arrays.deepToString(ns));//快速打印二维数组
+```
+
+## 面向对象编程
+
